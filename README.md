@@ -2,7 +2,7 @@
 **Curso:** Inteligencia Artificial y Mini-Robots
 **Autor:** David Camilo Guzmán Guerrero  
 **Fecha de Entrega:** Mayo 2025  
-**Repositorio:** https://github.com/lmao813/Tarea_AlgoritmosGeneticos  
+**Repositorio:** [Enlace a GitHub](https://github.com/lmao813/Tarea_AlgoritmosGeneticos)  
 
 ## Contenido  
 1. **Ejercicio 1:** Maximización de la función  
