@@ -1,6 +1,5 @@
 # Tarea de Algoritmos Genéticos  
 **Curso:** Inteligencia Artificial y Mini-Robots
-
 **Autor:** David Camilo Guzmán Guerrero  
 **Fecha de Entrega:** Mayo 2025  
 **Repositorio:** [Enlace a GitHub](https://github.com/lmao813/Tarea_AlgoritmosGeneticos)  
