@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 
 # --- Configuración ---
-IMG_PATH = "data/imagenes/objetivo.jpg"
+IMG_PATH = r"C:\Users\guerr\Downloads\objetivo.jpg"
 SAVE_DIR = "results"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
@@ -34,6 +34,15 @@ def init_pop(pop_size):
             np.random.shuffle(ind)
         pop.append(ind)
     return np.array(pop)
+
+def seleccion_torneo(pop, fit, k=3):
+    """Selección por torneo de tamaño k."""
+    seleccionados = []
+    for _ in range(len(pop)):
+        idx = np.random.choice(len(pop), k, replace=False)
+        mejor_idx = idx[np.argmax(fit[idx])]
+        seleccionados.append(pop[mejor_idx])
+    return np.array(seleccionados)
 
 # --- Cruce uniforme mejorado ---
 def cruza(p1, p2, alpha=0.5):
