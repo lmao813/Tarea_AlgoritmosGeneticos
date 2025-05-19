@@ -1,82 +1,107 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import os
 
-# --- Carga de la imagen objetivo ---
-img = Image.open("../../data/imagenes/objetivo.jpg").convert("L")
-objetivo = np.array(img, dtype=np.float32) / 255.0
+# --- Configuración ---
+IMG_PATH = "data/imagenes/objetivo.jpg"
+SAVE_DIR = "results"
+os.makedirs(SAVE_DIR, exist_ok=True)
+
+# --- Carga de imagen ---
+def load_image(img_path, target_size=(120, 180)):
+    img = Image.open(img_path).convert("L").resize(target_size)
+    return np.array(img, dtype=np.float32) / 255.0
+
+objetivo = load_image(IMG_PATH)
 filas, cols = objetivo.shape
 n_pix = filas * cols
 
-# --- Función de fitness (MSE inverso) ---
+# --- Fitness mejorado ---
 def fitness(ind):
-    ind_img = ind.reshape((filas, cols))
-    mse = np.mean((ind_img - objetivo)**2)
-    return 1.0 / (1.0 + mse)
+    mse = np.mean((ind.reshape((filas, cols)) - objetivo)**2)
+    return 1.0 / (1.0 + mse)  # MSE inverso
 
-# --- Inicialización ---
+# --- Población inicial con patrones ---
 def init_pop(pop_size):
-    # poblacion de vectores uniformes [0,1]
-    return np.random.rand(pop_size, n_pix)
+    pop = []
+    for _ in range(pop_size):
+        # Combinación de aleatoriedad y patrones básicos
+        if np.random.rand() > 0.5:
+            ind = np.random.rand(n_pix)  # Aleatorio
+        else:
+            ind = np.linspace(0, 1, n_pix)  # Degradado
+            np.random.shuffle(ind)
+        pop.append(ind)
+    return np.array(pop)
 
-# --- Selección torneo ---
-def seleccion_torneo(pop, fit, k=3):
-    sel = []
-    for _ in pop:
-        idx = np.random.choice(len(pop), k, replace=False)
-        best = idx[np.argmax(fit[idx])]
-        sel.append(pop[best])
-    return np.array(sel)
+# --- Cruce uniforme mejorado ---
+def cruza(p1, p2, alpha=0.5):
+    mask = np.random.rand(n_pix) < alpha
+    return np.where(mask, p1, p2), np.where(mask, p2, p1)
 
-# --- Cruce de un punto ---
-def cruza(p1, p2):
-    punto = np.random.randint(n_pix)
-    hijo1 = np.concatenate([p1[:punto], p2[punto:]])
-    hijo2 = np.concatenate([p2[:punto], p1[punto:]])
-    return hijo1, hijo2
-
-# --- Mutación ---
-def muta(ind, rate=0.01):
+# --- Mutación adaptativa ---
+def muta(ind, gen, max_gen, base_rate=0.05):
+    rate = base_rate * (1 - gen/max_gen)  # Reduce mutación con el tiempo
     mask = np.random.rand(n_pix) < rate
-    ind[mask] = np.random.rand(np.sum(mask))
+    ind[mask] = np.clip(ind[mask] + np.random.normal(0, 0.1, size=np.sum(mask)), 0, 1)
     return ind
 
 # --- Algoritmo principal ---
-def run_ga(pop_size=50, gens=300, cr=0.7, mr=0.01):
+def run_ga(pop_size=100, gens=500, cr=0.8, mr_base=0.05):
     pop = init_pop(pop_size)
-    best_hist = []
-    for g in range(gens):
+    best_hist, avg_hist = [], []
+
+    for gen in range(gens):
         fits = np.array([fitness(ind) for ind in pop])
-        best_hist.append(1.0/fits.max() - 1.0)  # almacena MSE mínimo
-        padres = seleccion_torneo(pop, fits)
+        best_hist.append(1.0/fits.max() - 1.0)
+        avg_hist.append(np.mean(1.0/fits - 1.0))
+
+        # Selección
+        padres = seleccion_torneo(pop, fits, k=3)
+
+        # Cruce y mutación
         hijos = []
         for i in range(0, pop_size, 2):
-            p1, p2 = padres[i], padres[i+1]
-            if np.random.rand() < cr:
-                h1, h2 = cruza(p1, p2)
-            else:
-                h1, h2 = p1.copy(), p2.copy()
-            hijos += [muta(h1, mr), muta(h2, mr)]
+            h1, h2 = cruza(padres[i], padres[i+1]) if np.random.rand() < cr else (padres[i].copy(), padres[i+1].copy())
+            hijos += [muta(h1, gen, gens, mr_base), muta(h2, gen, gens, mr_base)]
         pop = np.array(hijos)
 
-    # Mejor solución
-    fits = np.array([fitness(ind) for ind in pop])
-    idx = np.argmax(fits)
-    mejor = pop[idx].reshape((filas, cols))
+        # Guardar mejor imagen cada 50 gens
+        if gen % 50 == 0:
+            mejor_idx = np.argmax(fits)
+            plt.imsave(f"{SAVE_DIR}/gen_{gen}.png", pop[mejor_idx].reshape((filas, cols)), cmap="gray")
 
-    # Guarda y muestra
-    plt.imsave("../../ejercicio4_reconstruir_imagen/results/reconstruccion_final.png",
-               mejor, cmap="gray")
-    plt.figure(); plt.imshow(mejor, cmap="gray"); plt.axis("off")
-    plt.show()
+    # Resultado final
+    mejor = pop[np.argmax([fitness(ind) for ind in pop])].reshape((filas, cols))
+    return mejor, best_hist, avg_hist
 
-    # Grafica MSE
-    plt.figure()
-    plt.plot(best_hist)
-    plt.title("MSE mínimo por generación")
+# --- Visualización ---
+def plot_results(objetivo, reconstruccion, best_hist, avg_hist):
+    plt.figure(figsize=(15, 5))
+    
+    plt.subplot(1, 3, 1)
+    plt.imshow(objetivo, cmap="gray")
+    plt.title("Imagen Objetivo")
+    plt.axis("off")
+    
+    plt.subplot(1, 3, 2)
+    plt.imshow(reconstruccion, cmap="gray")
+    plt.title("Reconstrucción Final")
+    plt.axis("off")
+    
+    plt.subplot(1, 3, 3)
+    plt.plot(best_hist, label="Mejor MSE")
+    plt.plot(avg_hist, label="MSE Promedio")
     plt.xlabel("Generación")
     plt.ylabel("MSE")
+    plt.legend()
+    plt.title("Evolución del Error")
+    
+    plt.tight_layout()
+    plt.savefig(f"{SAVE_DIR}/comparacion_final.png")
     plt.show()
 
 if __name__ == "__main__":
-    run_ga()
+    mejor, best_hist, avg_hist = run_ga(pop_size=150, gens=1000)
+    plot_results(objetivo, mejor, best_hist, avg_hist)
