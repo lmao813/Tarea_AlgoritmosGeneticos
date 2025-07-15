@@ -45,3 +45,10 @@ Se implementa un **Algoritmo Genético (AG)** en Python para buscar el mejor des
   - Excedan la capacidad máxima de las plantas.
 - El AG evoluciona la población mediante selección por torneo, cruce promedio y mutación aleatoria.
 
+## 🖥️ Código en Python
+https://colab.research.google.com/drive/1xIrYpnJOsbf-pX6cbiId9BG6of8rCt-o#scrollTo=ZW98rhMLV8P3
+
+## ✅ Resultados
+
+
+
