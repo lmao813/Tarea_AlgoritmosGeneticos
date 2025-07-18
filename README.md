@@ -1,22 +1,40 @@
-# Tarea de Algoritmos Genéticos  
-**Curso:** Inteligencia Artificial y Mini-Robots  
-**Autor:** David Camilo Guzmán Guerrero  
-**Fecha de Entrega:** Mayo 2025  
-**Repositorio:** [Enlace a GitHub](https://github.com/lmao813/Tarea_AlgoritmosGeneticos)  
+# 🧬 Tarea de Algoritmos Genéticos  
+Curso: Inteligencia Artificial y Mini-Robots  
+Autor: David Camilo Guzmán Guerrero  
+Fecha de Entrega: Julio 2025  
+Repositorio: [GitHub - Tarea_AlgoritmosGeneticos](https://github.com/lmao813/Tarea_AlgoritmosGeneticos)
 
-## Contenido  
-- **Ejercicio 1:** Maximización de la función \[f(x) = x \sin(10\pi x) + 1\]  
-**Objetivo:** Encontrar el valor de x en el intervalo [0,1] que maximice f(x).  
-**Complejidad:** La función tiene múltiples máximos locales debido al término sin(10πx).  
-**Relevancia:** Ideal para demostrar la capacidad de los AGs en optimización multimodal.  
+---
 
-- **Ejercicio 3:** Despacho óptimo de generación eléctrica para Cali, Bogotá, Medellín y Barranquilla.  
-**Objetivo:** Encontrar la combinación óptima de despacho de energía desde plantas generadoras (Cali, Bogotá, Medellín, Barranquilla) hacia las ciudades demandantes, minimizando los costos totales (transporte + generación) mientras se satisfacen las demandas y capacidades de generación.  
-**Complejidad:** Combinatoria explosiva: Para 4 plantas y 4 ciudades, hay 256 posibles asignaciones (sin considerar valores continuos de GW). Además, los costos dependen de múltiples variables acopladas.  
-**Relevancia:** Problema clásico de optimización de recursos en ingeniería, demuestra la capacidad de los AGs para manejar restricciones complejas mediante penalizaciones; es aplicable a logística, distribución de agua, redes de suministro, etc.
-  
-- **Ejercicio 4:** Reconstrucción de una imagen (120×180) mediante evolución de matrices.  
-**Objetivo:** Evolucionar una población de matrices aleatorias (valores 0-255 para canales RGB) hasta aproximarse a una imagen objetivo, usando como función de aptitud la diferencia de píxeles (MSE o similar).  
-**Complejidad:** Espacio de búsqueda gigantesco; múltiples configuraciones pueden generar imágenes visualmente similares y un costo computacional intensivo.  
-**Relevancia:** Demuestra la capacidad de los AGs en optimización de alta dimensión. Aplicable al arte generativo, la reconstrucción de datos y la bioinformática.
+## 📚 Contenido
 
+### 📝 Ejercicio 1: Maximización de función matemática  
+Aplicación de un algoritmo genético para encontrar el valor de `x` que maximiza la función:  
+> **f(x) = x * sin(10πx) + 1**, con x ∈ [0,1]  
+
+- Se inicializa una población de valores aleatorios de `x`.
+- Se evalúa su desempeño según la función objetivo.
+- Se aplica selección, cruce y mutación para evolucionar hacia la mejor solución.
+- Resultado obtenido: **x ≈ 0.6515**, con **f(x) ≈ 1.6508**
+
+---
+
+### 📝 Ejercicio 2: Despacho óptimo de energía eléctrica  
+Simulación del despacho diario de energía desde 4 plantas generadoras a 4 ciudades colombianas.  
+El algoritmo busca minimizar el costo total considerando:  
+- Costos de transporte entre plantas y ciudades.
+- Costos de generación de energía por planta.
+- Restricciones de demanda y capacidad.
+
+✅ Resultado: se obtuvo una matriz óptima de asignación energética cumpliendo con las restricciones de demanda y capacidad, con costos reducidos.
+
+---
+
+### 📝 Ejercicio 3: Evolución de imágenes RGB  
+Se implementó un algoritmo genético para hacer que una población aleatoria de imágenes (120x180 RGB) evolucione hasta parecerse a una imagen objetivo.  
+- Población inicial: 50 imágenes aleatorias.  
+- Función de aptitud: error cuadrático respecto a la imagen objetivo (`target.png`).  
+- Operaciones genéticas: selección, cruce por máscara y mutación.  
+- Se observa cómo las imágenes generadas se van acercando visualmente a la imagen objetivo con cada generación.
+
+---
